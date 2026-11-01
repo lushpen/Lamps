@@ -4,11 +4,10 @@
     function initPlugin() {
         if (!window.Lampa || !window.$) return;
 
-        console.log('Educational Plugin: Successfully injected');
+        console.log('UAFlix Test: Plugin loaded');
 
         Lampa.Listener.follow('full', function (event) {
             if (event.type === 'complite' || event.type === 'complete') {
-                // Перевіряємо, чи кнопка вже існує, щоб не дублювати її
                 if (event.object.find('.button--test-plugin').length) return;
 
                 var myButton = $('<div class="full-start__button selector button--test-plugin"><span>Тест Плагіну</span></div>');
@@ -21,11 +20,6 @@
                 var buttonContainer = event.object.find('.full-start__buttons');
                 if (buttonContainer.length) {
                     buttonContainer.append(myButton);
-                    
-                    // Оновлюємо контролер навігації Lampa, щоб пульт бачив нову кнопку
-                    if (window.Lampa.Controller && window.Lampa.Controller.collection) {
-                        window.Lampa.Controller.collection(event.object);
-                    }
                 }
             }
         });
@@ -46,14 +40,14 @@
         $('head').append('<style>' + customStyles + '</style>');
     }
 
-    // Реєстрація через офіційний плагін-менеджер Lampa
-    if (window.Lampa && window.Lampa.Plugins) {
-        window.Lampa.Plugins.add('uaflix_test', initPlugin);
-    } else {
-        if (typeof window.lampa_started === 'undefined') {
-            window.lampa_started = [];
-        }
-        window.lampa_started.push(initPlugin);
+    // Безпечний запуск без Plugins.add, щоб уникнути конфлікту типів даних у u.replace
+    if (typeof window.lampa_started === 'undefined') {
+        window.lampa_started = [];
     }
+    window.lampa_started.push(initPlugin);
 
+    // Якщо Lampa вже працює, запускаємо паралельно
+    if (window.Lampa && window.appReady) {
+        initPlugin();
+    }
 })();
