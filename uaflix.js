@@ -1,53 +1,85 @@
 (function () {
     'use strict';
 
-    function initPlugin() {
-        if (!window.Lampa || !window.$) return;
+    function startPlugin() {
+        if (window.appReady) {
+            initUAFlix();
+        } else {
+            Lampa.Listener.follow('app', function (e) {
+                if (e.type == 'ready') initUAFlix();
+            });
+        }
+    }
 
-        console.log('UAFlix Test: Plugin loaded');
+    function initUAFlix() {
+        console.log('UAFlix Plugin: Ініціалізовано успішно!');
 
-        Lampa.Listener.follow('full', function (event) {
-            if (event.type === 'complite' || event.type === 'complete') {
-                if (event.object.find('.button--test-plugin').length) return;
+        Lampa.Listener.follow('full', function (e) {
+            if (e.type == 'complite' || e.type == 'complete') {
+                // Додаємо невеликий таймаут, щоб інтерфейс Smart TV встиг згенерувати блоки
+                setTimeout(function () {
+                    // Перевіряємо, чи кнопка вже існує, щоб не дублювати її при повторному відкритті
+                    if (e.object.find('.button--uaflix').length) return;
 
-                var myButton = $('<div class="full-start__button selector button--test-plugin"><span>Тест Плагіну</span></div>');
-                var currentMovie = event.data.movie;
+                    var button = $('<div class="full-start__button selector button--uaflix"><span>UAFlix UA</span></div>');
+                    var movieData = e.data.movie; 
 
-                myButton.on('hover:enter', function () {
-                    Lampa.Noty.show('Назва контенту: ' + (currentMovie.title || currentMovie.name));
-                });
+                    button.on('hover:enter', function () {
+                        Lampa.Select.show({
+                            title: 'Оберіть якість UAFlix',
+                            items: [
+                                { title: 'Full HD (1080p) - Українська', quality: '1080p', url: 'https://sample-videos.com' },
+                                { title: 'HD (720p) - Українська', quality: '720p', url: 'https://sample-videos.com' }
+                            ],
+                            onSelect: function (item) {
+                                Lampa.Player.play({
+                                    url: item.url,
+                                    title: movieData.title || movieData.name,
+                                    video: movieData
+                                });
+                            },
+                            onBack: function () {
+                                Lampa.Controller.toggle('full');
+                            }
+                        });
+                    });
 
-                var buttonContainer = event.object.find('.full-start__buttons');
-                if (buttonContainer.length) {
-                    buttonContainer.append(myButton);
-                }
+                    // Шукаємо контейнер для кнопок (перевіряємо кілька альтернативних класів для різних версій)
+                    var container = e.object.find('.full-start__buttons, .movie-full__buttons, .full-start__main');
+                    if (container.length) {
+                        container.append(button);
+                        
+                        // КРИТИЧНО: Оновлюємо колекцію навігації Lampa, щоб пульт Smart TV побачив нову кнопку
+                        if (window.Lampa.Controller && window.Lampa.Controller.collection) {
+                            window.Lampa.Controller.collection(e.object);
+                        }
+                    }
+                }, 150);
             }
         });
 
-        var customStyles = `
-            .button--test-plugin {
-                background: #28a745 !important;
-                color: #ffffff !important;
+        var styles = `
+            .button--uaflix {
+                background: #0057b7 !important;
+                color: #ffd700 !important;
                 border-radius: 4px;
                 margin-left: 10px;
             }
-            .button--test-plugin.focus {
-                background: #ffffff !important;
-                color: #28a745 !important;
-                box-shadow: 0 0 12px rgba(40, 167, 69, 0.6);
+            .button--uaflix.focus {
+                background: #ffd700 !important;
+                color: #0057b7 !important;
+                box-shadow: 0 0 10px rgba(255,215,0,0.5);
             }
         `;
-        $('head').append('<style>' + customStyles + '</style>');
+        $('head').append('<style>' + styles + '</style>');
     }
 
-    // Безпечний запуск без Plugins.add, щоб уникнути конфлікту типів даних у u.replace
-    if (typeof window.lampa_started === 'undefined') {
-        window.lampa_started = [];
-    }
-    window.lampa_started.push(initPlugin);
-
-    // Якщо Lampa вже працює, запускаємо паралельно
-    if (window.Lampa && window.appReady) {
-        initPlugin();
+    if (window.Lampa) {
+        startPlugin();
+    } else {
+        if (typeof window.lampa_started === 'undefined') {
+            window.lampa_started = [];
+        }
+        window.lampa_started.push(startPlugin);
     }
 })();
