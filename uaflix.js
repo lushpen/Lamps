@@ -1,9 +1,9 @@
 (function () {
     'use strict';
 
-    // Функція ініціалізації плагіна після завантаження Lampa
+    // Р¤СѓРЅРєС†С–СЏ С–РЅС–С†С–Р°Р»С–Р·Р°С†С–С— РїР»Р°РіС–РЅР° РїС–СЃР»СЏ Р·Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ Lampa
     function startPlugin() {
-        // Перевіряємо, чи додаток Lampa повністю готовий
+        // РџРµСЂРµРІС–СЂСЏС”РјРѕ, С‡Рё РґРѕРґР°С‚РѕРє Lampa РїРѕРІРЅС–СЃС‚СЋ РіРѕС‚РѕРІРёР№
         if (window.appReady) {
             initUAFlix();
         } else {
@@ -14,25 +14,25 @@
     }
 
     function initUAFlix() {
-        console.log('UAFlix Plugin: Ініціалізовано успішно!');
+        console.log('UAFlix Plugin: Р†РЅС–С†С–Р°Р»С–Р·РѕРІР°РЅРѕ СѓСЃРїС–С€РЅРѕ!');
 
-        // Додаємо кнопку "Дивитися на UAFlix" в картку опису фільму/серіалу
+        // Р”РѕРґР°С”РјРѕ РєРЅРѕРїРєСѓ "Р”РёРІРёС‚РёСЃСЏ РЅР° UAFlix" РІ РєР°СЂС‚РєСѓ РѕРїРёСЃСѓ С„С–Р»СЊРјСѓ/СЃРµСЂС–Р°Р»Сѓ
         Lampa.Listener.follow('full', function (e) {
             if (e.type == 'complite') {
                 var button = $('<div class="full-start__button selector button--uaflix"><span>UAFlix UA</span></div>');
                 
-                // Інформація про поточний фільм (назва, рік тощо)
+                // Р†РЅС„РѕСЂРјР°С†С–СЏ РїСЂРѕ РїРѕС‚РѕС‡РЅРёР№ С„С–Р»СЊРј (РЅР°Р·РІР°, СЂС–Рє С‚РѕС‰Рѕ)
                 var movieData = e.data.movie; 
 
                 button.on('hover:enter', function () {
                     Lampa.Select.show({
-                        title: 'Оберіть якість UAFlix',
+                        title: 'РћР±РµСЂС–С‚СЊ СЏРєС–СЃС‚СЊ UAFlix',
                         items: [
-                            { title: 'Full HD (1080p) - Українська', quality: '1080p', url: 'https://sample-videos.com' },
-                            { title: 'HD (720p) - Українська', quality: '720p', url: 'https://sample-videos.com' }
+                            { title: 'Full HD (1080p) - РЈРєСЂР°С—РЅСЃСЊРєР°', quality: '1080p', url: 'https://sample-videos.com' },
+                            { title: 'HD (720p) - РЈРєСЂР°С—РЅСЃСЊРєР°', quality: '720p', url: 'https://sample-videos.com' }
                         ],
                         onSelect: function (item) {
-                            // Запуск вбудованого плеєра Lampa
+                            // Р—Р°РїСѓСЃРє РІР±СѓРґРѕРІР°РЅРѕРіРѕ РїР»РµС”СЂР° Lampa
                             Lampa.Player.play({
                                 url: item.url,
                                 title: movieData.title || movieData.name,
@@ -45,16 +45,16 @@
                     });
                 });
 
-                // Впроваджуємо кнопку в інтерфейс після стандартної кнопки "Дивитися"
+                // Р’РїСЂРѕРІР°РґР¶СѓС”РјРѕ РєРЅРѕРїРєСѓ РІ С–РЅС‚РµСЂС„РµР№СЃ РїС–СЃР»СЏ СЃС‚Р°РЅРґР°СЂС‚РЅРѕС— РєРЅРѕРїРєРё "Р”РёРІРёС‚РёСЃСЏ"
                 e.object.find('.full-start__buttons').append(button);
             }
         });
 
-        // Додаємо власні стилі для кнопки
+        // Р”РѕРґР°С”РјРѕ РІР»Р°СЃРЅС– СЃС‚РёР»С– РґР»СЏ РєРЅРѕРїРєРё
         var styles = `
             .button--uaflix {
-                background: #0057b7 !important; /* Синій колір */
-                color: #ffd700 !important;      /* Жовтий текст */
+                background: #0057b7 !important; /* РЎРёРЅС–Р№ РєРѕР»С–СЂ */
+                color: #ffd700 !important;      /* Р–РѕРІС‚РёР№ С‚РµРєСЃС‚ */
                 border-radius: 4px;
                 margin-left: 10px;
             }
@@ -67,7 +67,7 @@
         $('head').append('<style>' + styles + '</style>');
     }
 
-    // Реєстрація плагіна в системі Lampa
+    // Р РµС”СЃС‚СЂР°С†С–СЏ РїР»Р°РіС–РЅР° РІ СЃРёСЃС‚РµРјС– Lampa
     if (window.Lampa) {
         startPlugin();
     }
